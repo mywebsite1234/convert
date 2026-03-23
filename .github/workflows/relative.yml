@@ -1,9 +1,7 @@
 name: Convert to Relative Paths
 
 on:
-  push:
-    branches:
-      - main # Change this to your deployment branch
+  workflow_dispatch:
 
 jobs:
   convert-paths:
