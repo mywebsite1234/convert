@@ -1,0 +1,38 @@
+name: Convert to Relative Paths
+
+on:
+  push:
+    branches:
+      - main # Change this to your deployment branch
+
+jobs:
+  convert-paths:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Convert absolute HTML paths to relative
+        run: |
+          # This specifically targets .html files and looks for src="/" or href="/"
+          # and replaces them with src="./" or href="./"
+          
+          # 1. Update href attributes
+          find . -type f -name "*.html" -exec sed -i 's/href="\//href=".\//g' {} +
+          
+          # 2. Update src attributes
+          find . -type f -name "*.html" -exec sed -i 's/src="\//src=".\//g' {} +
+          
+          echo "Path conversion complete."
+
+      # (Optional) Commit the changes back to the repository
+      # Note: Usually, it's better to do this *before* a deployment step 
+      # rather than committing generated changes back to your source code.
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          git add .
+          # Only commit if there are changes to avoid workflow errors
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: convert paths to relative"
+          git push
